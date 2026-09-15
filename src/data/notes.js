@@ -1,0 +1,18 @@
+export const notesData = [
+  { id: 'nt1', courseId: 'c1', chapter: 'Big-O Notation & Complexity Analysis', type: 'PDF', size: '1.2 MB', pages: 14 },
+  { id: 'nt2', courseId: 'c1', chapter: 'Arrays, Strings & Two Pointers', type: 'PDF', size: '2.0 MB', pages: 22 },
+  { id: 'nt3', courseId: 'c1', chapter: 'Linked Lists Deep Dive', type: 'PDF', size: '1.6 MB', pages: 18 },
+  { id: 'nt4', courseId: 'c1', chapter: 'Trees, Graphs & Traversals', type: 'PDF', size: '2.4 MB', pages: 26 },
+  { id: 'nt5', courseId: 'c1', chapter: 'Dynamic Programming Patterns', type: 'PDF', size: '2.1 MB', pages: 24 },
+  { id: 'nt6', courseId: 'c2', chapter: 'Modern HTML, CSS & Responsive Layouts', type: 'PDF', size: '1.8 MB', pages: 20 },
+  { id: 'nt7', courseId: 'c2', chapter: 'JavaScript Essentials for the Web', type: 'PDF', size: '2.2 MB', pages: 25 },
+  { id: 'nt8', courseId: 'c2', chapter: 'Building UIs with React', type: 'PDF', size: '2.6 MB', pages: 30 },
+  { id: 'nt9', courseId: 'c3', chapter: 'Real Numbers & Polynomials', type: 'PDF', size: '0.9 MB', pages: 10 },
+  { id: 'nt10', courseId: 'c3', chapter: 'Pair of Linear Equations', type: 'PDF', size: '1.1 MB', pages: 12 },
+  { id: 'nt11', courseId: 'c3', chapter: 'Triangles & Similarity', type: 'PDF', size: '1.3 MB', pages: 15 },
+  { id: 'nt12', courseId: 'c4', chapter: 'Kinematics & Laws of Motion', type: 'PDF', size: '1.7 MB', pages: 19 },
+  { id: 'nt13', courseId: 'c4', chapter: 'Work, Energy & Power', type: 'PDF', size: '1.4 MB', pages: 16 },
+  { id: 'nt14', courseId: 'c5', chapter: 'Python Basics & Variables', type: 'PDF', size: '1.0 MB', pages: 11 },
+  { id: 'nt15', courseId: 'c5', chapter: 'Loops & Conditionals', type: 'PDF', size: '1.2 MB', pages: 13 },
+  { id: 'nt16', courseId: 'c6', chapter: 'Number System & Percentages', type: 'PDF', size: '1.1 MB', pages: 12 },
+]
