@@ -1,0 +1,7 @@
+# build outputs and local temp files
+bin/
+__pycache__/
+*.pyc
+*.pdf
+01_Common/data/raw/*quick*.csv
+01_Common/data/env/*quick*.json

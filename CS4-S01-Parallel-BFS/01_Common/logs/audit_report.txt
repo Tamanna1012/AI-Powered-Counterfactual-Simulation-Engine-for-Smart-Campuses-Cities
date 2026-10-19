@@ -1,0 +1,36 @@
+AUDIT of /home/user/AI-Powered-Counterfactual-Simulation-Engine-for-Smart-Campuses-Cities/CS4-S01-Parallel-BFS/01_Common/data/raw/bfs_raw.csv  (588 raw rows) and /home/user/AI-Powered-Counterfactual-Simulation-Engine-for-Smart-Campuses-Cities/CS4-S01-Parallel-BFS/01_Common/data/derived/bfs_derived.csv (84 derived rows)
+
+1. Raw data checks
+  [PASS] all columns required by the manual are present in the raw CSV
+  [PASS] raw CSV leaves Speedup/Efficiency empty (derived metrics are not typed into raw data)
+  [PASS] every run has Verified = 1 (BFS result checked against the sequential distances)
+  [PASS] every one of the 84 configurations has exactly 7 repetitions (Run_ID 1..7)
+  [PASS] Run_IDs are 1..7 in every configuration
+  [PASS] sequential and parallel runs of each graph have the same Graph_Checksum (identical graph)
+  [PASS] all execution times are positive
+  [PASS] a single hardware label is used for all rows (no mixed-machine comparison)
+  [PASS] sequential rows have no synchronization measurement
+  [PASS] parallel rows have a non-negative synchronization measurement
+  [PASS] with 1 thread the barrier wait is exactly 0 (sanity)
+  [PASS] parallel and sequential runs reached the same number of vertices
+  [PASS] at least 3 problem sizes: [16384, 65536, 262144, 1048576]
+  [PASS] at least 3 thread/resource configurations: [1, 2, 4]
+
+2. Independent recomputation of derived metrics
+  [PASS] derived CSV has exactly one row per raw configuration
+  [PASS] median, speedup (=seq median / parallel median), efficiency (=speedup/threads), MTEPS (=edges/median time/1e6) and CV match the derived CSV for all 84 configurations
+  [PASS] Efficiency x Threads = Speedup in every derived row
+  [PASS] the sequential baseline has speedup 1 by definition
+  [PASS] speedup lies inside its [Speedup_Low, Speedup_High] range
+
+3. Variation and outliers (all runs are kept; nothing is removed)
+  configurations with CV > 15 %: 13 of 84; maximum CV = 49.9 % at ('random_d16', 16384, 'SEQ_BFS', 1)
+  largest single-run excursion above the median: x2.49 at ('random_d16', 16384, 'SEQ_BFS', 1); largest below: x0.75
+  of the 14 configurations with median < 1 ms, the mean CV is 14.1 %; for the others it is 8.9 %
+  configurations with a run > 1.5 x median: 7
+
+4. Word tables versus CSV
+  [PASS] 232 numbers printed in the Word tables agree with the CSV (within printed rounding)
+  [PASS] table audit covered 232 numbers in: CS4-S01_Integrated_Report.docx, Technical_Note_Student1.docx, Technical_Note_Student2.docx
+
+RESULT: ALL CHECKS PASSED

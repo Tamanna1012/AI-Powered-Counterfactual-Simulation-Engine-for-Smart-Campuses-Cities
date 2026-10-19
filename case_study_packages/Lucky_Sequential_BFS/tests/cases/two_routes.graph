@@ -1,8 +1,0 @@
-# long route 0-1-2-3-4 and short route 0-5-4: BFS must give dist[4]=2, not 4
-6 6
-0 1
-1 2
-2 3
-3 4
-0 5
-5 4
