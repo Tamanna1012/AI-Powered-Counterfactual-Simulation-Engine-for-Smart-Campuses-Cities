@@ -5,7 +5,7 @@ Legend: [x] done and verified in this session, [~] done with a caveat, [ ] needs
 ## A. Official manual (BCSE412L Case Study Assessment) -> evidence
 | Manual requirement | Status | Where |
 |---|---|---|
-| Report structure: Title, Abstract (150-200 words), Introduction + literature survey, Problem and research question, Methodology, Results and discussion, Limitations, Conclusion and future work, References | [x] Abstract = 193 words (checked by the build script). Sections numbered 1-7 consecutively (the manual's own list skips number 5; no requirement was dropped) | CS4-S01_Integrated_Report.docx |
+| Report structure: Title, Abstract (150-200 words), Introduction + literature survey, Problem and research question, Methodology, Results and discussion, Limitations, Conclusion and future work, References | [x] Abstract = 193 words (checked by the build script). Sections use the manual's own headings and numbering: 2 Abstract, 3 Introduction (along with Literature Survey), 4 Problem and Research Question, 6 Methodology, 7 Results and Discussion, 8 Limitations, 9 Conclusion and Future Work, 10 References (the manual has no section 5, so none was invented) | CS4-S01_Integrated_Report.docx |
 | Literature review: >= 5 scholarly papers, >= 3 recent | [~] 8 sources, 3 recent ([5] 2021, [6] 2022, [7] 2024). Several DOIs/volumes still marked CHECK | REFERENCES.md |
 | Implement a clearly defined baseline before optimisation | [x] | 02_Lucky_Sequential_BFS/bfs_seq.hpp |
 | >= 3 problem sizes | [x] 4 sizes (2^14 ... 2^20 vertices) + density sweep | data/raw/bfs_raw.csv |
