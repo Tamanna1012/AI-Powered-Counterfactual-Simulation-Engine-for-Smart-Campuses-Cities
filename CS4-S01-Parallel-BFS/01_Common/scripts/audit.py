@@ -201,34 +201,77 @@ def main():
                         p = [d for d in cands if d["Algorithm"] != "SEQ_BFS" and int(d["Threads"]) == th][0]
                         a1, a2 = c[j].split(" / ")
                         cmp(("T6", deg, f"speedup {th}T"), a1, float(p["Speedup"])); cmp(("T6", deg, f"MTEPS {th}T"), a2, float(p["MTEPS"]))
-        # Note 1 table (sequential baseline)
-        for t in find(tables(n1), "Graph"):
-            for row in t.rows[1:]:
-                c = [x.text for x in row.cells]
-                s = D(fam[c[0]], 2 ** int(c[1].split("^")[1]), False, 1)
-                cmp(("N1", c[0], c[1], "edges"), c[2], float(s["Edges_Undirected"])); cmp(("N1", c[0], c[1], "levels"), c[3], float(s["Levels"]))
-                cmp(("N1", c[0], c[1], "median ms"), c[4], float(s["Median"]) * 1e3); cmp(("N1", c[0], c[1], "CV"), c[5], float(s["CV_percent"])); cmp(("N1", c[0], c[1], "MTEPS"), c[6], float(s["MTEPS"]))
-        # Note 2 tables
-        for t in tables(n2):
-            h0 = t.rows[0].cells[0].text.strip()
+        def sr(ds, n):
+            return [float(x["Execution_Time"]) for x in groups[(ds, n, "SEQ_BFS", 1)]]
+        def S(ds, n, t):
+            return med[(ds, n, "SEQ_BFS", 1)] / med[(ds, n, "PAR_BFS_LEVELSYNC", t)]
+        def pm(ds, n, t, col):
+            return st.median(float(x[col]) for x in groups[(ds, n, "PAR_BFS_LEVELSYNC", t)])
+        def e2(n):
+            return int(n.split("^")[1])
+        for t in tables(n1):                                       # ---- Student 1 note
             hdr = [c.text.replace("\n", " ") for c in t.rows[0].cells]
-            if h0 == "Graph" and "1 thread speedup / eff." in hdr:
+            if "Median time (ms)" in hdr:                          # baseline results table
                 for row in t.rows[1:]:
                     c = [x.text for x in row.cells]
-                    ds, n = fam[c[0]], 2 ** int(c[1].split("^")[1])
-                    for j, th in zip((2, 3, 4), (1, 2, 4)):
-                        a1, a2 = c[j].split(" / ")
-                        d = D(ds, n, True, th)
-                        cmp(("N2", c[0], c[1], f"speedup {th}T"), a1, float(d["Speedup"])); cmp(("N2", c[0], c[1], f"eff {th}T"), a2, float(d["Efficiency"]))
-                    cmp(("N2", c[0], c[1], "MTEPS 4T"), c[5], float(D(ds, n, True, 4)["MTEPS"]))
-                    cmp(("N2", c[0], c[1], "MTEPS seq"), c[6], float(D(ds, n, False, 1)["MTEPS"]))
-            if h0.startswith("Graph (n = 2^20)"):
+                    ds, n = fam[c[0]], 2 ** e2(c[1])
+                    g0 = groups[(ds, n, "SEQ_BFS", 1)][0]
+                    m_, V, E, ET = med[(ds, n, "SEQ_BFS", 1)], float(g0["Vertices"]), float(g0["Edges_Undirected"]), float(g0["Edges_Traversed"])
+                    runs = sr(ds, n)
+                    cmp(("N1-base", c[0], c[1], "edges"), c[2], E); cmp(("N1-base", c[0], c[1], "levels"), c[3], float(g0["Levels"]))
+                    cmp(("N1-base", c[0], c[1], "median ms"), c[4], m_ * 1e3); cmp(("N1-base", c[0], c[1], "CV"), c[5], 100 * st.stdev(runs) / st.mean(runs))
+                    cmp(("N1-base", c[0], c[1], "MTEPS"), c[6], ET / m_ / 1e6); cmp(("N1-base", c[0], c[1], "ns per (n+m)"), c[7], m_ / (V + E) * 1e9)
+            if "Avg. degree" in hdr and "Max degree" in hdr:       # graph structure table
                 for row in t.rows[1:]:
                     c = [x.text for x in row.cells]
-                    d = D(fam[c[0]], nmax, True, 4)
-                    cmp(("N3", c[0], "levels"), c[1], float(d["Levels"])); cmp(("N3", c[0], "barrier %"), c[3], 100 * float(d["Sync_Wait_Frac"])); cmp(("N3", c[0], "merge %"), c[4], 100 * float(d["Merge_Frac"]))
-                    work = float(d["Edges_Traversed"]) / float(d["Levels"])
-                    cmp(("N3", c[0], "edges/level"), c[2], work)
+                    ds, n = fam[c[0]], 2 ** e2(c[1])
+                    g0 = groups[(ds, n, "SEQ_BFS", 1)][0]
+                    cmp(("N1-graph", c[0], c[1], "edges"), c[2], float(g0["Edges_Undirected"])); cmp(("N1-graph", c[0], c[1], "avg deg"), c[3], float(g0["Avg_Degree"]))
+                    cmp(("N1-graph", c[0], c[1], "max deg"), c[4], float(g0["Max_Degree"])); cmp(("N1-graph", c[0], c[1], "levels"), c[5], float(g0["Levels"]))
+                    cmp(("N1-graph", c[0], c[1], "reached %"), c[6], 100 * float(g0["Reached_Vertices"]) / float(g0["Vertices"]))
+            if "Median baseline (ms)" in hdr:                      # baseline-choice sensitivity table
+                for row in t.rows[1:]:
+                    c = [x.text for x in row.cells]
+                    ds = fam[c[0]]
+                    runs, p4 = sr(ds, nmax), med[(ds, nmax, "PAR_BFS_LEVELSYNC", 4)]
+                    for j2, v in zip(range(1, 7), (st.median(runs) * 1e3, st.mean(runs) * 1e3, min(runs) * 1e3, st.median(runs) / p4, st.mean(runs) / p4, min(runs) / p4)):
+                        cmp(("N1-sens", c[0], j2), c[j2], v)
+        for t in tables(n2):                                       # ---- Student 2 note
+            hdr = [c.text.replace("\n", " ") for c in t.rows[0].cells]
+            if len(hdr) > 2 and hdr[0] == "Graph" and hdr[1] == "Threads":           # speedup / efficiency table
+                ns_ = [e2(h.split("= ")[1]) for h in hdr[2:]]
+                for row in t.rows[1:]:
+                    c = [x.text for x in row.cells]
+                    ds, th = fam[c[0]], int(c[1])
+                    for j2, e in enumerate(ns_, 2):
+                        s_ = S(ds, 2 ** e, th)
+                        a1, a2 = c[j2].split(" / ")
+                        cmp(("N2-speedup", c[0], th, e, "S"), a1, s_); cmp(("N2-speedup", c[0], th, e, "E"), a2, s_ / th)
+            if "MTEPS 1T" in hdr:                                  # throughput table
+                for row in t.rows[1:]:
+                    c = [x.text for x in row.cells]
+                    ds, n = fam[c[0]], 2 ** e2(c[1])
+                    ET = float(groups[(ds, n, "SEQ_BFS", 1)][0]["Edges_Traversed"])
+                    cmp(("N2-teps", c[0], c[1], "seq"), c[2], ET / med[(ds, n, "SEQ_BFS", 1)] / 1e6)
+                    for j2, th in zip((3, 4, 5), (1, 2, 4)):
+                        cmp(("N2-teps", c[0], c[1], th), c[j2], ET / med[(ds, n, "PAR_BFS_LEVELSYNC", th)] / 1e6)
+            if "e (p = 2)" in hdr:                                 # Karp-Flatt table
+                kf = lambda s_, p_: (1 / s_ - 1 / p_) / (1 - 1 / p_)
+                for row in t.rows[1:]:
+                    c = [x.text for x in row.cells]
+                    ds = fam[c[0]]
+                    s2_, s4_ = S(ds, nmax, 2), S(ds, nmax, 4)
+                    cmp(("N2-kf", c[0], "S2"), c[1], s2_); cmp(("N2-kf", c[0], "e2"), c[2], kf(s2_, 2)); cmp(("N2-kf", c[0], "S4"), c[3], s4_); cmp(("N2-kf", c[0], "e4"), c[4], kf(s4_, 4))
+            if "Time per level, 4T (µs)" in hdr:                   # synchronization table
+                for row in t.rows[1:]:
+                    c = [x.text for x in row.cells]
+                    ds, n = fam[c[0]], 2 ** e2(c[1])
+                    g0 = groups[(ds, n, "SEQ_BFS", 1)][0]
+                    lv, ET, m4 = float(g0["Levels"]), float(g0["Edges_Traversed"]), med[(ds, n, "PAR_BFS_LEVELSYNC", 4)]
+                    cmp(("N2-sync", c[0], c[1], "levels"), c[2], lv); cmp(("N2-sync", c[0], c[1], "edges/level"), c[3], ET / lv)
+                    cmp(("N2-sync", c[0], c[1], "barrier %"), c[4], 100 * pm(ds, n, 4, "Synchronization_Time") / m4)
+                    cmp(("N2-sync", c[0], c[1], "merge %"), c[5], 100 * pm(ds, n, 4, "Frontier_Merge_Time") / m4)
+                    cmp(("N2-sync", c[0], c[1], "us/level"), c[6], m4 / lv * 1e6)
         check(not bad, f"{cnt} numbers printed in the Word tables agree with the CSV (within printed rounding)" + (f"; MISMATCHES: {bad[:5]}" if bad else ""))
         check(cnt > 0 and "CS4-S01_Integrated_Report.docx" in covered, f"table audit covered {cnt} numbers in: {', '.join(covered)}")
 

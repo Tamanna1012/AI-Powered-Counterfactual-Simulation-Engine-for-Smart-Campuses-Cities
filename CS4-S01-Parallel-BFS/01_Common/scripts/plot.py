@@ -31,6 +31,7 @@ def save(fig, name, out):
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--derived", default=str(ROOT / "data/derived/bfs_derived.csv"))
+    ap.add_argument("--raw", default=str(ROOT / "data/raw/bfs_raw.csv"))
     ap.add_argument("--out-dir", default=str(ROOT / "plots"))
     a = ap.parse_args()
     d = pd.read_csv(a.derived)
@@ -138,6 +139,72 @@ def main():
     ax.set_title("Speedup versus work per level")
     ax.legend(fontsize=8)
     save(fig, "fig7_work_per_level_vs_speedup.png", out)
+
+    extra_figures(d, Path(a.raw), out, fams, tmax)
+
+
+def extra_figures(d, raw_path, out, fams, tmax):
+    """figures used by the two technical notes: fig8/fig9 (Student 1 baseline), fig10 (Student 2 per-level cost)"""
+    seq = d[d.Algorithm == "SEQ_BFS"]
+    par = d[d.Algorithm != "SEQ_BFS"]
+    # ---- Fig 8: sequential baseline - time and throughput vs size
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9.2, 3.8))
+    for f in fams:
+        s_ = seq[seq.Dataset == f].sort_values("Problem_Size")
+        ax1.plot(s_.Problem_Size, s_.Median * 1e3, "-o", color=COLORS[f], label=LABELS[f])
+        ax2.plot(s_.Problem_Size, s_.MTEPS, "-o", color=COLORS[f], label=LABELS[f])
+    for ax in (ax1, ax2):
+        ax.set_xscale("log", base=2)
+        ax.set_xlabel("Number of vertices")
+    ax1.set_yscale("log")
+    ax1.set_ylabel("Median sequential BFS time (ms, log scale)")
+    ax1.set_title("Sequential time vs graph size")
+    ax2.set_ylabel("Sequential throughput (MTEPS)")
+    ax2.set_title("Sequential throughput vs graph size")
+    ax2.legend(fontsize=8)
+    fig.tight_layout()
+    save(fig, "fig8_baseline_scaling.png", out)
+
+    # ---- Fig 9: run-to-run variation of the 7 sequential runs per configuration (raw data)
+    raw = pd.read_csv(raw_path)
+    rs = raw[raw.Algorithm == "SEQ_BFS"].copy()
+    rs["rel"] = rs.Execution_Time / rs.groupby(["Dataset", "Problem_Size"]).Execution_Time.transform("median")
+    fig, ax = plt.subplots(figsize=(9.2, 3.8))
+    pos, ticks, labels = 0, [], []
+    for f in fams:
+        for n in sorted(rs.Problem_Size.unique()):
+            g = rs[(rs.Dataset == f) & (rs.Problem_Size == n)]
+            ax.scatter([pos] * len(g), g.rel, s=18, color=COLORS[f], alpha=0.85, label=LABELS[f] if n == rs.Problem_Size.min() else None)
+            ticks.append(pos)
+            labels.append(f"2^{int(round(__import__('math').log2(n)))}")
+            pos += 1
+        pos += 0.8
+    ax.axhline(1, color="black", lw=0.8)
+    ax.set_xticks(ticks)
+    ax.set_xticklabels(labels, fontsize=7, rotation=45)
+    ax.set_ylabel("Run time / median of the 7 runs")
+    ax.set_xlabel("Graph structure and size (vertices) - each dot is one run")
+    ax.set_title("Run-to-run variation of the sequential baseline")
+    ax.legend(fontsize=8, ncol=4)
+    save(fig, "fig9_baseline_run_variation.png", out)
+
+    # ---- Fig 10: cost per BFS level (microseconds) at the largest size
+    nmax = int(d.Problem_Size.max())
+    fig, ax = plt.subplots(figsize=(6.2, 4.2))
+    for f in fams:
+        p_ = par[(par.Dataset == f) & (par.Problem_Size == nmax)].sort_values("Threads")
+        ax.plot(p_.Threads, p_.Median / p_.Levels * 1e6, "-o", color=COLORS[f], label=f"{LABELS[f]} - OpenMP")
+        s_ = seq[(seq.Dataset == f) & (seq.Problem_Size == nmax)].iloc[0]
+        ax.axhline(s_.Median / s_.Levels * 1e6, color=COLORS[f], ls=":", lw=1)
+    ax.set_xscale("log", base=2)
+    ax.set_xticks(sorted(par.Threads.unique()))
+    ax.set_xticklabels(sorted(par.Threads.unique()))
+    ax.set_yscale("log")
+    ax.set_xlabel("OpenMP threads")
+    ax.set_ylabel("Median time per BFS level (microseconds, log scale)")
+    ax.set_title(f"Cost per level (n = {nmax:,}); dotted = sequential")
+    ax.legend(fontsize=7)
+    save(fig, "fig10_per_level_cost.png", out)
 
 
 if __name__ == "__main__":

@@ -16,7 +16,7 @@ Case study CS4-S01 Parallel Breadth-First Search - BCSE412L Parallel Computing, 
 | `bfs_seq_main.cpp` | Baseline benchmark program (builds graph, warm-up, timed repetitions, raw-CSV rows) |
 | `../01_Common/graph.hpp` | CSR graph, generators, graph-file loader, start-vertex rule, checksum |
 | `../01_Common/tests/cases/` | 12 test graphs and hand-computed expected distances |
-| `Technical_Note_Student1.docx` | Individual technical note (2 pages) |
+| `Technical_Note_Student1.docx` | Individual technical note (5 pages: algorithm, worked example, graph statistics, test-case table, baseline results, run-to-run variation, baseline sensitivity) |
 | `Student1_Source_Code_Appendix.docx` | Supplementary: complete source of bfs_seq.hpp and bfs_seq_main.cpp |
 
 ## Shared files (both students)

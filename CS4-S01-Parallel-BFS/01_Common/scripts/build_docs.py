@@ -234,6 +234,18 @@ def table(doc, header, rows, widths=None, size=8.5, caption=None, bold_first_col
             for p in c.paragraphs:
                 p.paragraph_format.space_after = Pt(0)
                 p.paragraph_format.line_spacing = 1.0
+    # header row repeats on every page; tables of up to 14 rows are kept on one page
+    trPr = t.rows[0]._tr.get_or_add_trPr()
+    hdr_el = OxmlElement("w:tblHeader")
+    hdr_el.set(qn("w:val"), "true")
+    trPr.append(hdr_el)
+    for ri, row in enumerate(t.rows):
+        cs = OxmlElement("w:cantSplit")
+        row._tr.get_or_add_trPr().append(cs)
+        if len(t.rows) <= 15 and ri < len(t.rows) - 1:
+            for c in row.cells:
+                for p_ in c.paragraphs:
+                    p_.paragraph_format.keep_with_next = True
     if widths:
         t.autofit = False
         for i, w in enumerate(widths):
@@ -254,6 +266,7 @@ def figure_row(doc, items, width=3.15):
         c.text = ""
         c.paragraphs[0].alignment = WD_ALIGN_PARAGRAPH.CENTER
         c.paragraphs[0].add_run().add_picture(str(FIG / fn), width=Inches(width))
+        c.paragraphs[0].paragraph_format.keep_with_next = True
         c2 = t.rows[1].cells[i]
         c2.text = ""
         run = c2.paragraphs[0].add_run(cap)
@@ -558,128 +571,10 @@ def build_report():
     print("report built; abstract words:", wc)
 
 
-# =============================================================== NOTE 1
-def build_note1():
-    doc = new_doc(size=10.5)
-    eqc1 = [0]
-    para(doc, "Individual Technical Note — Student 1", bold=True, align="center", size=14, after=2)
-    para(doc, "Sequential BFS, graph preparation, correctness and baseline", align="center", size=11, after=2)
-    para(doc, "CS4-S01 Parallel Breadth-First Search — BCSE412L Parallel Computing | [Student 1 name, Reg. No.] | Batch [ID]", align="center", size=9.5, after=6)
-    doc.add_heading("1  My contribution", level=1)
-    para(doc, "I was responsible for the baseline of the case study: explaining the BFS algorithm, implementing the sequential BFS in C++, preparing reproducible graph inputs, verifying correctness, "
-              "measuring the sequential baseline and documenting the baseline methodology. My partner built the OpenMP version on top of the same graph code and conventions, so that speedups are measured against my baseline. "
-              "Both of us wrote the literature survey and the integrated report.", align="justify")
-    doc.add_heading("2  The BFS algorithm and its cost", level=1)
-    para(doc, "BFS starts at a source vertex s with distance 0. A queue holds the vertices that have been discovered but not yet expanded. The algorithm removes the vertex u at the head of the queue and, "
-              "for every neighbour v of u that has not been discovered (dist[v] = −1), sets dist[v] = dist[u] + 1 and appends v. Because the queue is first-in-first-out, vertices are expanded in order of distance, "
-              "so the first time a vertex is reached is along a shortest path. Vertices that are never reached keep the value −1.", align="justify")
-    para(doc, "Pseudocode:  dist[*] = −1; dist[s] = 0; push(s);  while queue not empty: u = pop(); for each neighbour v of u: if dist[v] == −1: dist[v] = dist[u] + 1; push(v).", italic=True, size=9.5)
-    para(doc, "Each vertex is pushed and popped once and each adjacency entry is read once, giving a running time O(n + m) and extra memory O(n) for the distance array and the queue. "
-              "In the code (02_Lucky_Sequential_BFS/bfs_seq.hpp) the queue is a plain integer array of length n, which is enough because no vertex is pushed twice.", align="justify")
-    equation(doc, EQ_COMPLEX, eqc1)
-    doc.add_heading("3  Graph preparation", level=1)
-    para(doc, "All graphs are undirected, simple and stored in compressed sparse row (CSR) form: an offset array off[0..n] and a neighbour array adj, so that the neighbours of u are adj[off[u]..off[u+1]−1]. "
-              "Building the CSR removes self-loops and duplicate edges and sorts each neighbour list. I wrote four generators in 01_Common/graph.hpp:", align="justify")
-    bullets(doc, [
-        "**Path** (n vertices in a line): n levels, one vertex per level; the worst case for parallelism.",
-        "**Grid** (√n × √n, four neighbours): about 2√n levels; frontier width up to √n.",
-        "**Random** (uniform random pairs, average degree 16 or other values): few levels, very wide frontiers.",
-        "**R-MAT** (Graph500-like parameters 0.57/0.19/0.19/0.05, vertex labels permuted): skewed degrees with hubs.",
-    ])
-    para(doc, "Generators use our own SplitMix64 random generator with a fixed seed (12345), so the same graph is produced on every compiler and operating system. "
-              "Each CSV row stores a checksum of the graph; the analysis script stops if the sequential and parallel rows of one graph have different checksums. "
-              "The start vertex rule is vertex 0 for path and grid, and the lowest-numbered vertex of highest degree for random and R-MAT graphs. "
-              "Graph construction is never part of the timed region.", align="justify")
-    doc.add_heading("4  Correctness verification", level=1)
-    para(doc, "I verified the sequential BFS in three ways (log: 01_Common/logs/correctness_test_output.txt):", after=1)
-    bullets(doc, [
-        "**Hand-computed cases.** Twelve small graphs in tests/cases with expected distances worked out by hand: path (two start vertices), star, cycle, 3×3 grid, complete graph, binary tree, a disconnected graph, an isolated source, a single vertex, a graph with duplicate edges and a self-loop, and a graph with a long and a short route (distance must be 2, not 4).",
-        "**Independent validator.** validate_bfs() checks that dist[s] = 0, that neighbouring vertices differ by at most one level, that reachable and unreachable vertices are never adjacent, and that every reached vertex has a neighbour one level closer. It does not reuse the BFS code.",
-        "**Cross-checks.** Randomized comparisons of sequential and parallel results on path, grid, random, R-MAT and disconnected graphs, plus tests of error handling (bad source, bad edge). Together with the hand cases the program runs 1,402 checks; all passed.",
-    ])
-    doc.add_heading("5  Baseline measurement methodology", level=1)
-    para(doc, "The timed region is a single call of bfs_seq(), which includes allocating and initialising its dist and queue arrays. One warm-up run is discarded, then seven timed runs are recorded as separate rows of the raw CSV with the manual’s required columns. "
-              "Execution time is summarised by the median, with standard deviation, CV, minimum and maximum kept. The machine and compiler are described in the integrated report (Table 3). "
-              "The sequential time of each graph is the baseline T_seq in the speedup S_p = T_seq / T_p. The baseline throughput is", align="justify", after=1)
-    equation(doc, EQ_TEPS_SEQ, eqc1)
-    para(doc, "where m_c is the number of undirected edges in the component reached from the start vertex (Graph500 convention).", align="justify")
-    doc.add_heading("6  Baseline results", level=1)
-    rows = []
-    for ds, lab in FAM:
-        for n in sorted(D.Problem_Size.unique()):
-            s = r(ds, n, 0)
-            rows.append([lab, f"2^{int(round(__import__('math').log2(n)))}", f"{int(s.Edges_Undirected):,}", int(s.Levels), f"{s.Median*1e3:.3f}", f"{s.CV_percent:.0f}", f"{s.MTEPS:.0f}"])
-    table(doc, ["Graph", "n", "Edges", "Levels", "Median time (ms)", "CV (%)", "MTEPS"], rows, widths=[1.4, 0.6, 1.0, 0.8, 1.2, 0.6, 0.7], size=8, caption="Table 1. Sequential BFS baseline (7 runs per row; 01_Common/data/derived/bfs_derived.csv).")
-    para(doc, f"The time per edge is not constant. The largest random graph needs {ms('random_d16', NMAX):.0f} ms, but its throughput ({mt('random_d16', NMAX):.0f} MTEPS) is much lower than for the same family at 2^18 vertices ({mt('random_d16', 2**18):.0f} MTEPS). "
-              "The path and the grid keep high and stable throughput (about 125–350 MTEPS) probably because their neighbours are close in memory, whereas the random and R-MAT graphs jump to random positions of the distance array. "
-              "I did not measure cache events, so the link to cache misses is a likely explanation, not a proven one. Runs shorter than about a millisecond are noisy "
-              f"(CV up to {D[D.Algorithm=='SEQ_BFS'].CV_percent.max():.0f}% on this shared virtual machine), so I use the medians and keep all runs.", align="justify")
-    doc.add_heading("7  Limitations", level=1)
-    para(doc, "The baseline was measured on one shared cloud machine; the graphs are synthetic; one start vertex per graph is used; and the queue-based algorithm is not the fastest possible sequential BFS (for example, a direction-optimizing sequential version could be faster on random graphs). "
-              "All speedups in the report are relative to this specific baseline.", align="justify")
-    doc.save(OUT_N1 / "Technical_Note_Student1.docx")
-
-
-# =============================================================== NOTE 2
-def build_note2():
-    doc = new_doc(size=10.5)
-    eqc2 = [0]
-    para(doc, "Individual Technical Note — Student 2", bold=True, align="center", size=14, after=2)
-    para(doc, "OpenMP parallel BFS, thread scaling and synchronization", align="center", size=11, after=2)
-    para(doc, "CS4-S01 Parallel Breadth-First Search — BCSE412L Parallel Computing | [Student 2 name, Reg. No.] | Batch [ID]", align="center", size=9.5, after=6)
-    doc.add_heading("1  My contribution", level=1)
-    para(doc, "I implemented the level-synchronous parallel BFS in C++ with OpenMP (03_Girlfriend_OpenMP_BFS/bfs_par.hpp and bfs_par_main.cpp), ran it with several thread counts, measured execution time, speedup, efficiency and traversal throughput, "
-              "and analysed synchronization, parallel overhead and scalability. I used the graph code, start-vertex rule, timing convention and correctness checks prepared by Student 1 so that the two programs are directly comparable.", align="justify")
-    doc.add_heading("2  Parallel design and synchronization", level=1)
-    para(doc, "BFS is parallelized level by level. The frontier (the vertices at distance L) is shared among threads; the next frontier (distance L+1) is built while this happens. The whole traversal is inside one parallel region, so threads are created once, not once per level.", align="justify")
-    bullets(doc, [
-        "**Race on the visited flag.** Two threads may reach the same unvisited vertex v in the same level. The distance array is an array of std::atomic<int>. A thread first reads dist[v] (cheap); if it is −1, it executes compare_exchange from −1 to L+1. Exactly one thread succeeds and only that thread appends v to the next frontier, so there are no duplicates and no lost updates. No lock is needed.",
-        "**Building the next frontier without contention.** Each thread appends to its own private buffer (aligned to cache lines to avoid false sharing). After a barrier one thread computes prefix sums of the buffer sizes; every thread then copies its buffer to its own disjoint slice of the next-frontier array, so these writes need no atomics.",
-        "**Level separation.** OpenMP barriers (the implicit barrier of single constructs and an explicit barrier) guarantee that level L is completely expanded before level L+1 starts. This is what makes the distances equal to the true BFS distances. One thread swaps the frontier arrays and increments the level; the others read the new values after the barrier.",
-        "**Scheduling.** The expand loop uses schedule(runtime), set to dynamic with chunk 64, because the work per frontier vertex depends on its degree (R-MAT hubs). The schedule can be changed with --schedule and --chunk; the tests cover static, dynamic and guided.",
-    ])
-    para(doc, "Correctness evidence: parallel distances equal sequential distances in all 588 timed runs, in the 12 hand-checked cases for thread counts 1, 2, 3, 4 and 8 and all three schedules, and in randomized cross-checks (1,402 checks in total, all passed).", align="justify")
-    doc.add_heading("3  Experiments and metrics", level=1)
-    para(doc, f"I ran 1, 2 and 4 threads (the machine has {ENV['logical_cpus']} logical CPUs; threads were pinned with OMP_PROC_BIND=true, OMP_PLACES=cores) on four structures and four sizes plus a density sweep, with one warm-up and seven timed runs for each setting. "
-              "Execution time is the median of the repeated runs. Speedup and efficiency (Student 1’s sequential BFS on the same graph is the baseline) and traversal throughput in TEPS (m_c = undirected edges in the reached component) are", align="justify", after=1)
-    equation(doc, EQ_SPEEDUP, eqc2)
-    equation(doc, EQ_EFF, eqc2)
-    equation(doc, EQ_TEPS, eqc2)
-    para(doc, "I report millions of TEPS (MTEPS). "
-              "After each timed run I made one extra instrumented run that records, for every level, the expand time of each thread, giving the barrier wait (slowest thread minus average thread) and the time of the merge phase. These runs never contribute to Execution_Time.", align="justify")
-    doc.add_heading("4  Results", level=1)
-    rows = []
-    for ds, lab in FAM:
-        for n in (2 ** 16, NMAX):
-            rows.append([lab, f"2^{int(round(__import__('math').log2(n)))}"] + [f"{sig(sp(ds, n, t))} / {sig(ef(ds, n, t))}" for t in (1, 2, 4)] + [f"{mt(ds, n, 4):.0f}", f"{mt(ds, n, 0):.0f}"])
-    table(doc, ["Graph", "n", "1 thread\nspeedup / eff.", "2 threads\nspeedup / eff.", "4 threads\nspeedup / eff.", "MTEPS (4T)", "MTEPS (seq.)"], rows, widths=[1.3, 0.5, 1.1, 1.1, 1.1, 0.7, 0.7], size=8.5, caption="Table 1. Speedup, efficiency and throughput (medians of 7 runs; full table in 01_Common/data/derived/bfs_derived.csv).")
-    figure_row(doc, [("fig2_speedup_vs_threads.png", f"Figure 1. Speedup versus threads for {NMAX:,} vertices."),
-                     ("fig5_efficiency_vs_threads.png", f"Figure 2. Efficiency versus threads for {NMAX:,} vertices.")], width=3.0)
-    para(doc, f"**Scalability across thread counts.** On random and R-MAT graphs, speedup grows with threads (to {f2(sp('random_d16', NMAX))} and {f2(sp('rmat_ef8', NMAX))} on four threads at 2^20 vertices) and efficiency stays near {f2(ef('random_d16', NMAX))}–{f2(ef('rmat_ef8', NMAX))}. "
-              f"At 2^14 vertices the same graphs reach only {f2(sp('random_d16', NMIN))} and {f2(sp('rmat_ef8', NMIN))} (efficiency {f2(ef('random_d16', NMIN))} and {f2(ef('rmat_ef8', NMIN))}): the whole run lasts less than a millisecond, so thread start-up and barriers take a larger share. "
-              f"On the grid the speedup stays below 1 ({f2(sp('grid', NMAX, 1))}, {f2(sp('grid', NMAX, 2))}, {f2(sp('grid', NMAX, 4))}), and on the path it falls with every added thread ({sig(sp('path', NMAX, 1))}, {sig(sp('path', NMAX, 2))}, {sig(sp('path', NMAX, 4))}).", align="justify")
-    para(doc, f"**Throughput.** With four threads the random graph of 2^18 vertices reaches {f1(dmt(2, TMAX))} MTEPS at average degree 2 and {f1(dmt(64, TMAX))} MTEPS at degree 64 (Figure 3 of the integrated report), so denser graphs make better use of the threads.", align="justify")
-    doc.add_heading("5  Synchronization and overhead analysis", level=1)
-    para(doc, f"Every level costs a fixed amount of synchronization, which does not depend on how much work the level contains. On the path (one vertex per level) the median time per level is {p_lev_us[1]:.2f} µs with one thread, {p_lev_us[2]:.2f} µs with two and {p_lev_us[4]:.2f} µs with four, "
-              f"against {seq_level_ns:.1f} ns for the sequential program, so the parallel code is {1/sp('path', NMAX):.0f} times slower with four threads. "
-              f"The same fixed cost is small compared with the work of a level on the random graph, which has about {work_per_level['random_d16']:,.0f} undirected edges per level on average at 2^20 vertices.", align="justify")
-    rows = []
-    for ds, lab in FAM:
-        s = r(ds, NMAX, TMAX)
-        rows.append([lab, int(s.Levels), f"{work_per_level[ds]:,.0f}", f"{100*s.Sync_Wait_Frac:.1f}", f"{100*s.Merge_Frac:.1f}"])
-    table(doc, ["Graph (n = 2^20)", "Levels", "Undirected edges per level", "Barrier wait (% of 4T time)", "Merge phase (% of 4T time)"], rows, widths=[1.5, 0.8, 1.4, 1.5, 1.5], size=8.5,
-          caption="Table 2. Synchronization measurements with 4 threads (from instrumented runs; approximate).")
-    para(doc, f"The barrier wait is largest, as a share of the run, on the grid ({100*SYNC4['grid'][0]:.0f}%) and the path ({100*SYNC4['path'][0]:.0f}%), and below {100*max(SYNC4['random_d16'][0], SYNC4['rmat_ef8'][0]):.1f}% on the random and R-MAT graphs at this size. "
-              "A plausible reason (not tested separately) is that with schedule dynamic,64 a frontier of fewer than 64 vertices is taken by a single thread while the others wait; the path and grid have many such small frontiers. "
-              "The merge phase is the dominant measured overhead on the path and grid because it runs once per level. These numbers explain part but not all of the lost time; loop start-up and the barrier’s own cost inside the expand phase were not separable.", align="justify")
-    doc.add_heading("6  Limitations and what I would do next", level=1)
-    para(doc, "Only up to four threads on a shared virtual machine could be tested, so saturation and NUMA effects are not visible; the CV of short runs is high; the schedule was fixed to dynamic,64; and there is no direction-optimizing or hybrid (sequential for small frontiers) variant. "
-              "The next step I would try is to run small frontiers sequentially, which should remove most of the penalty on the path and grid, and to add a bottom-up step for the large frontiers of random and R-MAT graphs.", align="justify")
-    doc.save(OUT_N2 / "Technical_Note_Student2.docx")
-
-
 if __name__ == "__main__":
     build_report()
+    from build_notes import build_note1, build_note2
+
     build_note1()
     build_note2()
     print("done ->", OUT_REPORT, OUT_N1, OUT_N2)

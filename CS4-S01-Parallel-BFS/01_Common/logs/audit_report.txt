@@ -30,7 +30,7 @@ AUDIT of /home/user/AI-Powered-Counterfactual-Simulation-Engine-for-Smart-Campus
   configurations with a run > 1.5 x median: 7
 
 4. Word tables versus CSV
-  [PASS] 232 numbers printed in the Word tables agree with the CSV (within printed rounding)
-  [PASS] table audit covered 232 numbers in: CS4-S01_Integrated_Report.docx, Technical_Note_Student1.docx, Technical_Note_Student2.docx
+  [PASS] 496 numbers printed in the Word tables agree with the CSV (within printed rounding)
+  [PASS] table audit covered 496 numbers in: CS4-S01_Integrated_Report.docx, Technical_Note_Student1.docx, Technical_Note_Student2.docx
 
 RESULT: ALL CHECKS PASSED

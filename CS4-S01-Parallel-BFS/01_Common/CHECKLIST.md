@@ -16,7 +16,7 @@ Legend: [x] done and verified in this session, [~] done with a caveat, [ ] needs
 | >= 3 graphs and one summary table | [x] 7 graphs, 3 summary tables in the report | plots/, report |
 | Explain observed performance | [x] sections 4.1-4.4 | report |
 | Limitations, threats to validity, >= 3 future directions | [x] 7 limitations, 5 directions | report 5, 6 |
-| Individual technical note 2-3 pages | [x] Student 1 = 2 pages, Student 2 = 3 pages (LibreOffice count, A4; confirm in Word) | 02_/03_ folders |
+| Individual technical note 2-3 pages | [~] **Extended to 5 pages each at the students' request** (LibreOffice count, A4). The manual says 2-3 pages, so check with your faculty whether a longer note is acceptable; if not, tell me and I will shorten them | 02_/03_ folders |
 | Batch report 8-12 pages | [x] 9 pages (LibreOffice count, A4; confirm in Word) | 01_Common |
 | Source code with instructions | [x] | README.md, Makefile |
 | Raw experimental data in CSV | [x] 588 rows; all required columns | data/raw/bfs_raw.csv |
@@ -32,7 +32,7 @@ Legend: [x] done and verified in this session, [~] done with a caveat, [ ] needs
 * [x] Raw CSV: required columns present; 84 configurations x exactly 7 runs; every run Verified = 1; sequential and parallel runs of each graph share one Graph_Checksum; one hardware label; 1-thread barrier wait = 0.
 * [x] **Independent recomputation** (standard library only, no code shared with analyze.py) of median, speedup, efficiency, MTEPS and CV for all 84 configurations: identical to data/derived/bfs_derived.csv.
 * [x] Formulas: speedup = sequential median / parallel median (same graph); efficiency = speedup / threads; TEPS = undirected edges in reached component / time.
-* [x] **232 numbers printed in the Word tables** (report Tables 4-6, Note 1 Table 1, Note 2 Tables 1-2) match the CSV within printed rounding.
+* [x] **496 numbers printed in the Word tables** (report Tables 4-6; Note 1 Tables 3, 5, 6; Note 2 Tables 3-6) match the raw CSV, recomputed independently, within printed rounding. (This audit caught a rounding slip in a new table, which was fixed.)
 * [x] Source files in the three appendices are line-for-line identical to the real source files (checked programmatically).
 * [x] `make` compiles without warnings and `make test` passes 1402/1402 checks from the new folder layout; the experiment runner `--quick` smoke test runs and verifies in the new layout.
 * [x] The raw CSV is byte-identical (MD5) to the original measurement; no data or algorithm was changed in the rebuild (source files were only moved).
