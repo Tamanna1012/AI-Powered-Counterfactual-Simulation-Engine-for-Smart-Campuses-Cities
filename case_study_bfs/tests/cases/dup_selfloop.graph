@@ -1,0 +1,9 @@
+# duplicate edge (0 1 twice), self loop (1 1), and a shortcut 0-2
+5 7
+0 1
+0 1
+1 1
+1 2
+0 2
+2 3
+3 4
