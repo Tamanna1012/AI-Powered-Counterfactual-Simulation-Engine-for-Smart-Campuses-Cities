@@ -1,0 +1,29 @@
+Environment: {
+ "cpu_model": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+ "logical_cpus": 4,
+ "ram_gb": 15.7,
+ "os": "Linux-6.18.44-fc-v139-x86_64-with-glibc2.39",
+ "compiler": "g++ (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0"
+}
+[1/21] path n=16384 {}
+[2/21] grid n=16384 {}
+[3/21] random n=16384 {'deg': 16}
+[4/21] rmat n=16384 {'edge-factor': 8}
+[5/21] path n=65536 {}
+[6/21] grid n=65536 {}
+[7/21] random n=65536 {'deg': 16}
+[8/21] rmat n=65536 {'edge-factor': 8}
+[9/21] path n=262144 {}
+[10/21] grid n=262144 {}
+[11/21] random n=262144 {'deg': 16}
+[12/21] rmat n=262144 {'edge-factor': 8}
+[13/21] path n=1048576 {}
+[14/21] grid n=1048576 {}
+[15/21] random n=1048576 {'deg': 16}
+[16/21] rmat n=1048576 {'edge-factor': 8}
+[17/21] random n=262144 {'deg': 2}
+[18/21] random n=262144 {'deg': 4}
+[19/21] random n=262144 {'deg': 8}
+[20/21] random n=262144 {'deg': 32}
+[21/21] random n=262144 {'deg': 64}
+Done. Raw CSV: /home/user/AI-Powered-Counterfactual-Simulation-Engine-for-Smart-Campuses-Cities/case_study_bfs/data/raw/bfs_raw.csv
