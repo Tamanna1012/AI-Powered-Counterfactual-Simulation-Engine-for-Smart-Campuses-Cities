@@ -146,7 +146,7 @@ function StudyWeek({ week }: { week: number }) {
           </Button>
         </div>
       </Card>
-      <p className="mt-4 text-center text-sm text-muted">Take your time. A short break is okay. 🌷</p>
+      <p className="mt-4 text-center text-sm text-muted">Take your time. A short break is okay. 🌱</p>
     </div>
   );
 }

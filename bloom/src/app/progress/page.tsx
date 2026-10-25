@@ -29,13 +29,13 @@ export default function ProgressPage() {
   const best = rated.length >= 2 ? [...rated].sort((a, b) => b.accuracy! - a.accuracy!)[0] : null;
   const gentle = rated.length >= 2 ? [...rated].sort((a, b) => a.accuracy! - b.accuracy!)[0] : null;
   const insights: string[] = [];
-  if (best) insights.push(`Your strongest week so far is Week ${best.week} (${pct(best.accuracy)} across ${best.attempts} answers). 🌷`);
+  if (best) insights.push(`Your strongest week so far is Week ${best.week} (${pct(best.accuracy)} across ${best.attempts} answers). 🌟`);
   if (gentle && best && gentle.week !== best.week) insights.push(`Week ${gentle.week} could use a gentle revisit (${pct(gentle.accuracy)} so far) — no rush.`);
   if (trend.length >= 3) {
     const half = Math.floor(trend.length / 2);
     const early = trend.slice(0, half).reduce((a, b) => a + b, 0) / half;
     const late = trend.slice(-half).reduce((a, b) => a + b, 0) / half;
-    if (late > early + 0.02) insights.push("Your recent sessions are scoring higher than your earlier ones. You're getting stronger! 💗");
+    if (late > early + 0.02) insights.push("Your recent sessions are scoring higher than your earlier ones. You're getting stronger! 💪");
   }
 
   if (!ready) return <Skeleton className="h-96" />;
@@ -159,9 +159,9 @@ function Sparkline({ values }: { values: number[] }) {
   const pts = values.map((v, i) => [(i / Math.max(values.length - 1, 1)) * (w - 16) + 8, h - 8 - v * (h - 16)] as const);
   return (
     <svg viewBox={`0 0 ${w} ${h}`} className="mt-2 w-full max-w-lg" role="img" aria-label={`Session scores: ${values.map((v) => Math.round(v * 100) + "%").join(", ")}`}>
-      <polyline points={pts.map((p) => p.join(",")).join(" ")} fill="none" stroke="#e0527f" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+      <polyline points={pts.map((p) => p.join(",")).join(" ")} fill="none" stroke="#5f67e8" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
       {pts.map((p, i) => (
-        <circle key={i} cx={p[0]} cy={p[1]} r="4" fill="#fff" stroke="#c72c62" strokeWidth="2.5" />
+        <circle key={i} cx={p[0]} cy={p[1]} r="4" fill="#fff" stroke="#3b3bb3" strokeWidth="2.5" />
       ))}
     </svg>
   );

@@ -4,12 +4,12 @@ import { Shell } from "@/components/Shell";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Bloom — Your Little Study Buddy",
-  description: "A gentle NPTEL quiz study companion. Practice any weeks, one question at a time.",
+  title: "Bloom — Your Study Buddy",
+  description: "A friendly, motivating NPTEL quiz study app. Practice any weeks in shuffled order, with answers verified against the solution PDFs.",
 };
 
 export const viewport: Viewport = {
-  themeColor: "#fff8fa",
+  themeColor: "#f6f8ff",
   width: "device-width",
   initialScale: 1,
 };

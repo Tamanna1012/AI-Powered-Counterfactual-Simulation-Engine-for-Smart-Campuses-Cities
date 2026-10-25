@@ -63,7 +63,7 @@ export default function HomePage() {
         <div className="relative max-w-xl">
           <h1 className="text-4xl font-semibold text-rose-800 sm:text-5xl">{greeting(now.getHours())}</h1>
           <p className="mt-3 text-lg leading-relaxed text-ink/90">
-            Ready to make a little progress today? You don&apos;t have to learn everything at once. Let&apos;s take it one question at a time. 💗
+            Ready to make some progress today? You don&apos;t have to learn everything at once — one question at a time, a little every day, adds up fast. 🚀
           </p>
           <div className="mt-6 flex flex-wrap gap-3">
             <ButtonLink href="/practice" className="px-7 py-3 text-base">
@@ -85,7 +85,7 @@ export default function HomePage() {
         <Stat
           label="Weeks started"
           value={`${overall.weeksStarted} / 12`}
-          hint={overall.weeksCompleted ? `${overall.weeksCompleted} completed 🌸` : "none completed yet"}
+          hint={overall.weeksCompleted ? `${overall.weeksCompleted} completed 🎉` : "none completed yet"}
         />
         <Stat
           label="Practice accuracy"
@@ -95,7 +95,7 @@ export default function HomePage() {
         <Stat
           label="Study days in a row"
           value={streak > 0 ? String(streak) : "—"}
-          hint={streak > 1 ? "no pressure — rest days are fine" : streak === 1 ? "lovely start" : "start whenever you like"}
+          hint={streak > 1 ? "nice consistency — rest days are fine too" : streak === 1 ? "great start" : "start whenever you like"}
           icon={streak > 1 ? <Flame size={16} className="text-rose-500" aria-hidden="true" /> : undefined}
         />
       </section>

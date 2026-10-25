@@ -128,7 +128,7 @@ function Results() {
             <h2 className="text-2xl font-semibold text-rose-800">Questions to look at again</h2>
             <Badge tone="rose">{wrong.length}</Badge>
           </div>
-          <p className="mt-1 text-sm text-muted">No judgment — these are just the ones worth a second look. 💗</p>
+          <p className="mt-1 text-sm text-muted">No judgment — these are just the ones worth a second look. 💪</p>
           <ul className="mt-3 grid gap-3">
             {wrong.map((r) => {
               const q = byId.get(r.qid);

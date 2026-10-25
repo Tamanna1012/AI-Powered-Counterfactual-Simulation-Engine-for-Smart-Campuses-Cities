@@ -13,9 +13,9 @@ export function Flower({ className = "", size = 64 }: { className?: string; size
     <svg className={className} width={size} height={size} viewBox="0 0 64 64" aria-hidden="true" focusable="false">
       <g transform="translate(32 32)">
         {[0, 72, 144, 216, 288].map((r) => (
-          <ellipse key={r} rx="9" ry="16" cy="-14" fill="#fcbdd3" stroke="#f593b4" strokeWidth="1.2" transform={`rotate(${r})`} />
+          <ellipse key={r} rx="9" ry="16" cy="-14" fill="#b4c0ff" stroke="#5f67e8" strokeWidth="1.2" transform={`rotate(${r})`} />
         ))}
-        <circle r="8" fill="#ffe9a8" stroke="#f2c85c" strokeWidth="1.2" />
+        <circle r="8" fill="#ffd66b" stroke="#f0a92e" strokeWidth="1.2" />
       </g>
     </svg>
   );
@@ -119,7 +119,7 @@ export function PageHeader({ title, subtitle, children }: { title: string; subti
   );
 }
 
-export function EmptyState({ icon = "🌷", title, children, action }: { icon?: string; title: string; children?: ReactNode; action?: ReactNode }) {
+export function EmptyState({ icon = "🌱", title, children, action }: { icon?: string; title: string; children?: ReactNode; action?: ReactNode }) {
   return (
     <Card className="text-center">
       <div className="float mx-auto mb-2 text-4xl" aria-hidden="true">
@@ -141,7 +141,7 @@ export function Petals({ burst, count = 16 }: { burst: number; count?: number })
   const [items, setItems] = useState<{ id: number; left: number; dx: number; rot: number; delay: number; dur: number; glyph: string }[]>([]);
   useEffect(() => {
     if (!burst) return;
-    const glyphs = ["🌸", "💗", "✨", "🌷", "💕"];
+    const glyphs = ["🌱", "✨", "🎉", "⭐", "💪"];
     const next = Array.from({ length: count }, (_, i) => ({
       id: burst * 1000 + i,
       left: Math.random() * 100,
@@ -181,13 +181,13 @@ export function ProgressRing({ value, size = 44, label }: { value: number; size?
   const pct = Math.min(1, Math.max(0, value));
   return (
     <svg width={size} height={size} role="img" aria-label={`${label}: ${Math.round(pct * 100)}%`} className="shrink-0">
-      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#ffdce8" strokeWidth="5" />
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="#d9e0ff" strokeWidth="5" />
       <circle
         cx={size / 2}
         cy={size / 2}
         r={r}
         fill="none"
-        stroke="#e0527f"
+        stroke="#4a4ccf"
         strokeWidth="5"
         strokeLinecap="round"
         strokeDasharray={c}

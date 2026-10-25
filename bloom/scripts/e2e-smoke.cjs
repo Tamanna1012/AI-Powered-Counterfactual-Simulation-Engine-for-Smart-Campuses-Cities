@@ -78,7 +78,7 @@ async function runSession(page, { weeksToPick, count, answerRight }) {
 
   await page.goto(BASE + "/");
   await page.getByRole("heading", { level: 1 }).waitFor();
-  check(/sunshine|lovely|night owl/i.test(await page.getByRole("heading", { level: 1 }).innerText()), "home greets warmly");
+  check(/good (morning|afternoon|evening)|night owl|hey/i.test(await page.getByRole("heading", { level: 1 }).innerText()), "home greets the student");
   check((await page.getByText("120", { exact: true }).count()) > 0, "home shows 120 verified questions");
   check((await page.getByText("answer a question to see this").count()) === 1, "new user starts with zero progress (no fake accuracy)");
   check(await page.getByRole("link", { name: /Start Practicing/ }).isVisible(), "Start Practicing button visible");

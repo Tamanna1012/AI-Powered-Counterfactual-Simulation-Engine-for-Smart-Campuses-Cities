@@ -39,11 +39,11 @@ export function Shell({ children }: { children: ReactNode }) {
       <header className="flex items-center justify-between gap-3 py-4">
         <Link href="/" className="flex items-center gap-2 rounded-full pr-2" aria-label="Bloom home">
           <span className="grid h-10 w-10 place-items-center rounded-full bg-gradient-to-br from-blush-200 to-lav-100 text-xl shadow-soft" aria-hidden="true">
-            🌸
+            🌱
           </span>
           <span className="leading-tight">
             <span className="block font-display text-xl font-semibold text-rose-800">Bloom</span>
-            <span className="hidden text-xs text-muted sm:block">your little study buddy</span>
+            <span className="hidden text-xs text-muted sm:block">your study buddy</span>
           </span>
         </Link>
 
@@ -86,7 +86,7 @@ export function Shell({ children }: { children: ReactNode }) {
 
       <footer className="pb-24 pt-6 text-center text-sm text-muted md:pb-8">
         <p className="inline-flex items-center gap-1">
-          Made with <Heart size={14} className="fill-rose-500 text-rose-500" aria-label="love" /> for you. One question at a time.
+          <Heart size={14} className="fill-rose-500 text-rose-500" aria-hidden="true" /> Small steps, every day. Keep growing.
         </p>
         <p className="mt-1">
           Answers come only from your solution PDFs · progress is saved on this device ·{" "}

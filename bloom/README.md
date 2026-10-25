@@ -1,15 +1,15 @@
-# Bloom — Your Little Study Buddy 🌸
+# Bloom — Your Study Buddy 🌱
 
-A gentle, pink-themed NPTEL quiz study app (Public Speaking, Weeks 1–12). Every question, answer and
+A friendly, motivating quiz study app for NPTEL *Public Speaking* (Weeks 1–12). Practice any combination of weeks in shuffled order, study at your own pace, and track real progress. Every question, answer and
 source reference comes **only** from the 12 solution PDFs. Nothing is invented or guessed.
 
-- Next.js (App Router) · TypeScript · Tailwind CSS v4 · Lucide icons · mupdf (WASM) for PDF reading
+- Next.js (App Router) · TypeScript · Tailwind CSS v4 · Lucide icons · mupdf (WASM) for PDF reading · Vitest · Playwright
 - Student features: Home, Weeks, Practice (any weeks, shuffled, balanced), Study, Bookmarks/Review, Progress
 - Admin: `/admin` import & verification dashboard (upload PDFs, inspect, correct, export dataset)
 - No database and no login: progress is saved in the browser (`localStorage`) **on that device only**.
   There is **no cross-device sync**.
 
-## What was extracted from your PDFs
+## What was extracted from the PDFs
 
 | | |
 |---|---|
@@ -91,7 +91,12 @@ Streak is only a gentle note and never shown as pressure.
 
 ## Not done / limitations
 - OCR for scanned PDFs is **not implemented** (the importer detects pages without text and reports them).
-  None of your 12 PDFs need it.
+  None of the 12 PDFs need it.
 - No accounts or cross-device sync (would need Supabase/auth — not built).
 - Actual deployment to Vercel was **not performed** from this environment; the production build and a local
   production server were tested.
+
+## Before making the repo public
+The 12 solution PDFs are committed in `bloom/public/sources/` and are publicly downloadable once deployed.
+If they are course material you don't have the right to redistribute, remove them (and set the app's
+"Open page" links aside) before pushing to a public GitHub repo — `data/questions.json` alone is enough for the app to run.

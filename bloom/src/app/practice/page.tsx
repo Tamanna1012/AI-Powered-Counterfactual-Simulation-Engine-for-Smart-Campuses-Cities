@@ -69,8 +69,8 @@ function PracticeSetup() {
           </h2>
           <p className="mt-1 text-muted">
             {incorrect.length
-              ? `${incorrect.length} question${incorrect.length > 1 ? "s" : ""} you last got wrong. Gentle second chance, no pressure. 💗`
-              : "Nothing to review right now — every question you've answered is currently right. 🌷"}
+              ? `${incorrect.length} question${incorrect.length > 1 ? "s" : ""} you last got wrong. A fresh shot at them — no pressure. 💪`
+              : "Nothing to review right now — every question you've answered is currently right. 🌟"}
           </p>
           <Button className="mt-3" disabled={!incorrect.length} onClick={() => startIds(incorrect, "review")}>
             Start review
@@ -123,7 +123,7 @@ function PracticeSetup() {
           })}
         </ul>
         <p className="mt-3 text-[0.95rem] text-ink" aria-live="polite">
-          {selected.length === 0 ? "Pick at least one week to begin. 🌷" : <><strong>{available}</strong> verified question{available === 1 ? "" : "s"} across {selected.length} week{selected.length > 1 ? "s" : ""}.</>}
+          {selected.length === 0 ? "Pick at least one week to begin. 👆" : <><strong>{available}</strong> verified question{available === 1 ? "" : "s"} across {selected.length} week{selected.length > 1 ? "s" : ""}.</>}
         </p>
       </section>
 
@@ -177,7 +177,7 @@ function PracticeSetup() {
         <div className="flex flex-wrap items-center justify-between gap-4">
           <p className="max-w-md text-[0.95rem] text-ink">
             {selected.length
-              ? <>Ready? <strong>{resolved.count}</strong> question{resolved.count === 1 ? "" : "s"}, mixed from {selected.length === 1 ? `Week ${selected[0]}` : `${selected.length} weeks`}. You&apos;ve got this, sunshine! ☀️</>
+              ? <>Ready? <strong>{resolved.count}</strong> question{resolved.count === 1 ? "" : "s"}, mixed from {selected.length === 1 ? `Week ${selected[0]}` : `${selected.length} weeks`}. You&apos;ve got this! 🚀</>
               : "Choose a week to see your session."}
           </p>
           <Button className="px-8 py-3 text-base" disabled={!selected.length || resolved.count === 0} onClick={() => startWeeks(selected, requested)}>

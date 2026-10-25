@@ -54,7 +54,7 @@ export default function SessionPage() {
   if (!session) {
     return (
       <EmptyState title="No practice in progress" action={<ButtonLink href="/practice">Choose weeks to practice</ButtonLink>}>
-        Start a session whenever you feel ready. There&apos;s no rush. 🌷
+        Start a session whenever you feel ready. There&apos;s no rush. 🌱
       </EmptyState>
     );
   }
@@ -178,7 +178,7 @@ export default function SessionPage() {
               )}
             </>
           ) : isLast ? (
-            <Button onClick={finish}>See my results 🌸</Button>
+            <Button onClick={finish}>See my results 🎉</Button>
           ) : (
             <Button onClick={() => store.update((p) => goTo(p, index + 1))}>
               Next question <ArrowRight size={16} aria-hidden="true" />
@@ -195,7 +195,7 @@ export default function SessionPage() {
         <Modal title="Leave this session?" onClose={() => setConfirmExit(false)}>
           <p>Your answers are saved. You can pause and pick this up again from the Home screen, or wrap up now and see how you did.</p>
           <div className="mt-5 grid gap-2">
-            <Button onClick={() => setConfirmExit(false)}>Keep going 💗</Button>
+            <Button onClick={() => setConfirmExit(false)}>Keep going 💪</Button>
             <Button variant="soft" onClick={() => router.push("/")}>
               Pause &amp; leave
             </Button>
